@@ -22,14 +22,17 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         listView.setAdapter(adapter);
 
+
         receiver = new NotificationReceiver();
         NotificationReceiver.setNotificationListener(new NotificationListener() {
-            @Override
+
             public void onNotificationPosted(NotificationReceiver.NotificationItem notification) {
+
+                System.out.println("Timestamp: posted not" );
                 adapter.add(notification.getAppName() + ": " + notification.getMessage());
             }
 
-            @Override
+
             public void onNotificationRemoved(NotificationReceiver.NotificationItem notification) {
                 adapter.remove(notification.getAppName() + ": " + notification.getMessage());
             }
@@ -45,6 +48,16 @@ public class MainActivity extends AppCompatActivity {
 
     private String[] getNotificationStrings() {
         List<NotificationReceiver.NotificationItem> notificationList = NotificationReceiver.getNotificationList();
+
+        System.out.println("Timestamp: " );
+        // Add a sample notification
+        String sampleAppName = "Sample App";
+        String sampleMessage = "This is a sample notification";
+        long sampleTimestamp = System.currentTimeMillis();
+        NotificationReceiver.NotificationItem sampleNotification = new NotificationReceiver.NotificationItem(sampleAppName, sampleMessage, sampleTimestamp);
+        notificationList.add(sampleNotification);
+
+        System.out.println("Timestamp:56 " );
         String[] strings = new String[notificationList.size()];
         for (int i = 0; i < notificationList.size(); i++) {
             NotificationReceiver.NotificationItem notification = notificationList.get(i);
