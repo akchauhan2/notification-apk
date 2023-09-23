@@ -31,19 +31,15 @@ public class NotificationReceiver extends NotificationListenerService {
     }
 
     @Override
-    public void onNotificationPosted( StatusBarNotification sbn) {
+    public void onNotificationPosted(StatusBarNotification sbn) {
         // Extract relevant notification information
         String appName = sbn.getPackageName();
         String message = sbn.getNotification().extras.getString(android.app.Notification.EXTRA_TEXT);
-        long timestamp = sbn.getPostTime();
 
-        System.out.println(" Timestamp posted:");
-
-        // Create a new NotificationItem and pass it to the storeNotification() method
-        NotificationItem notificationItem = new NotificationItem(appName, message, timestamp);
-        storeNotification(notificationItem); // Call the storeNotification method
-
+        // Add the received notification to the adapter in MainActivity
+        MainActivity.addNotification(appName, message);
     }
+
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
@@ -61,7 +57,7 @@ public class NotificationReceiver extends NotificationListenerService {
     }
 
     public static List<NotificationItem> getNotificationList() {
-        System.out.print("Timestamp"+notificationList);
+        System.out.print("Timestamp getNotificationList"+notificationList);
         return notificationList;
     }
 

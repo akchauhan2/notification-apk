@@ -9,9 +9,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ListView listView;
-    private ArrayAdapter<String> adapter;
-    private NotificationReceiver receiver;
+    private static ListView listView;
+    private static ArrayAdapter<String> adapter;
+    private static NotificationReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,19 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         receiver = new NotificationReceiver();
-        NotificationReceiver.setNotificationListener(new NotificationListener() {
+        NotificationReceiver.setNotificationListener(new NotificationListener());
 
-            public void onNotificationPosted(NotificationReceiver.NotificationItem notification) {
-
-                System.out.println("Timestamp: posted not" );
-                adapter.add(notification.getAppName() + ": " + notification.getMessage());
-            }
-
-
-            public void onNotificationRemoved(NotificationReceiver.NotificationItem notification) {
-                adapter.remove(notification.getAppName() + ": " + notification.getMessage());
-            }
-        });
     }
 
     @Override
@@ -45,11 +34,10 @@ public class MainActivity extends AppCompatActivity {
         adapter.clear();
         adapter.addAll(getNotificationStrings());
     }
-
     private String[] getNotificationStrings() {
         List<NotificationReceiver.NotificationItem> notificationList = NotificationReceiver.getNotificationList();
 
-        System.out.println("Timestamp: " );
+        System.out.println("notificationList: "+notificationList );
         // Add a sample notification
         String sampleAppName = "Sample App";
         String sampleMessage = "This is a sample notification";
@@ -64,5 +52,9 @@ public class MainActivity extends AppCompatActivity {
             strings[i] = notification.getAppName() + ": " + notification.getMessage();
         }
         return strings;
+    }
+
+    public static void addNotification(String appName, String message) {
+        adapter.add(appName + ": " + message);
     }
 }

@@ -5,16 +5,12 @@ import android.service.notification.StatusBarNotification;
 public class NotificationListener extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
-
-        System.out.println("Timestamp: StatusBarNotification" );
         // Extract relevant notification information
         String appName = sbn.getPackageName();
         String message = sbn.getNotification().extras.getString(android.app.Notification.EXTRA_TEXT);
-        long timestamp = sbn.getPostTime();
 
-        // Create a new NotificationItem and pass it to the storeNotification() method
-        NotificationReceiver.NotificationItem notificationItem = new NotificationReceiver.NotificationItem(appName, message, timestamp);
-        NotificationReceiver.storeNotification(notificationItem);
+        // Add the received notification to the adapter in MainActivity
+        MainActivity.addNotification(appName, message);
     }
 
     @Override
