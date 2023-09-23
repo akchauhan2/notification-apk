@@ -11,14 +11,35 @@ import java.util.List;
 
 public class NotificationReceiver extends NotificationListenerService {
 
+    private static List<NotificationItem> notificationList = new ArrayList<>();
+    private static NotificationListener notificationListener;
+ 
     @Override
-    public void onNotificationPosted(StatusBarNotification sbn) {
+    public void onNotificationPosted( StatusBarNotification sbn) {
         // Handle the posted notification
+        if (notificationListener != null) {
+            NotificationItem notificationItem = new NotificationItem(sbn.getPackageName(), sbn.getNotification().tickerText.toString(), sbn.getPostTime());
+            notificationList.add(notificationItem);
+            notificationListener.onNotificationPosted(notificationItem);
+        }
     }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
         // Handle the removed notification
+        if (notificationListener != null) {
+            NotificationItem notificationItem = new NotificationItem(sbn.getPackageName(), sbn.getNotification().tickerText.toString(), sbn.getPostTime());
+            notificationList.remove(notificationItem);
+            notificationListener.onNotificationRemoved(notificationItem);
+        }
+    }
+
+    public static void setNotificationListener(NotificationListener listener) {
+        notificationListener = listener;
+    }
+
+    public static List<NotificationItem> getNotificationList() {
+        return notificationList;
     }
 
     public static class NotificationItem {
@@ -32,8 +53,6 @@ public class NotificationReceiver extends NotificationListenerService {
             this.timestamp = timestamp;
         }
 
-        // Getter methods for the notification item's properties
-
         public String getAppName() {
             return appName;
         }
@@ -44,29 +63,6 @@ public class NotificationReceiver extends NotificationListenerService {
 
         public long getTimestamp() {
             return timestamp;
-        }
-    }
-
-    public static class Companion {
-        private static List<NotificationItem> notificationList = new ArrayList<>();
-        private static NotificationListener notificationListener;
-
-        public static void setNotificationListener(NotificationListener listener) {
-            notificationListener = listener;
-        }
-
-        public static void storeNotification(NotificationItem notificationItem) {
-            // Add the notificationItem to the notificationList
-            notificationList.add(notificationItem);
-
-            // Notify the listener (NotificationListenerService) about the new notification
-            if (notificationListener != null) {
-                notificationListener.onNotificationPosted(null); // Pass null as StatusBarNotification object
-            }
-        }
-
-        public static List<NotificationItem> getNotificationList() {
-            return notificationList;
         }
     }
 }

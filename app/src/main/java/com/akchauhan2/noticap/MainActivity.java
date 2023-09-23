@@ -1,74 +1,55 @@
 package com.akchauhan2.noticap;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ListView taskListView;
-    private ArrayAdapter<NotificationReceiver.NotificationItem> adapter;
-    private List<NotificationReceiver.NotificationItem> notificationList;
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+    private NotificationReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        taskListView = findViewById(R.id.taskListView);
+        listView = findViewById(R.id.listView);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        listView.setAdapter(adapter);
 
-        // Get the list of captured notifications from NotificationReceiver
-        notificationList = new ArrayList<>(); // Initialize an empty list
+        receiver = new NotificationReceiver();
+        NotificationReceiver.setNotificationListener(new NotificationListener() {
+            @Override
+            public void onNotificationPosted(NotificationReceiver.NotificationItem notification) {
+                adapter.add(notification.getAppName() + ": " + notification.getMessage());
+            }
 
-        // Create an ArrayAdapter to display the notifications in the ListView
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notificationList);
-
-        // Set the ArrayAdapter as the ListView's adapter
-        taskListView.setAdapter(adapter);
+            @Override
+            public void onNotificationRemoved(NotificationReceiver.NotificationItem notification) {
+                adapter.remove(notification.getAppName() + ": " + notification.getMessage());
+            }
+        });
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
+        adapter.clear();
+        adapter.addAll(getNotificationStrings());
+    }
 
-        // Register the NotificationListener
-        ComponentName component = new ComponentName(this, NotificationListener.class);
-        PackageManager pm = getPackageManager();
-        pm.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
-        // Check if the user has granted access to the notification listener
-        if (!isNotificationListenerEnabled()) {
-            // Prompt the user to grant access
-            Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-            startActivity(intent);
-            Toast.makeText(this, "Please grant access to the notification listener", Toast.LENGTH_LONG).show();
+    private String[] getNotificationStrings() {
+        List<NotificationReceiver.NotificationItem> notificationList = NotificationReceiver.getNotificationList();
+        String[] strings = new String[notificationList.size()];
+        for (int i = 0; i < notificationList.size(); i++) {
+            NotificationReceiver.NotificationItem notification = notificationList.get(i);
+            strings[i] = notification.getAppName() + ": " + notification.getMessage();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // Unregister the NotificationListener
-        ComponentName component = new ComponentName(this, NotificationListener.class);
-        PackageManager pm = getPackageManager();
-        pm.setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-    }
-
-    private boolean isNotificationListenerEnabled() {
-        ComponentName component = new ComponentName(this, NotificationListener.class);
-        String flat = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
-        return flat != null && flat.contains(component.flattenToString());
+        return strings;
     }
 }
