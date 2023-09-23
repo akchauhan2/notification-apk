@@ -1,37 +1,49 @@
 package com.akchauhan2.noticap;
 
+import android.app.Notification;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
-import java.util.Calendar;
-import java.util.Date;
 public class NotificationListener extends NotificationListenerService {
+
+    private static final String TAG = "NotificationListener";
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
-        // Extract relevant notification information
-        String appName = sbn.getPackageName();
-        String message = sbn.getNotification().extras.getString(android.app.Notification.EXTRA_TEXT);
+        Log.d(TAG, "onNotificationPosted");
+
+        String packageName = sbn.getPackageName();
+        String message = "";
+        if (sbn.getNotification().tickerText != null) {
+            message = sbn.getNotification().tickerText.toString();
+        } else {
+            if (sbn.getNotification().extras != null && sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
+                message = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT).toString();
+            }
+        }
         long timestamp = sbn.getPostTime();
-        Date date = new Date(timestamp);
 
-// Create a Calendar instance and set the date
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1; // Month starts from 0, so add 1
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        // Create a new NotificationItem with additional parameters
-        NotificationReceiver.NotificationItem notificationItem = new NotificationReceiver.NotificationItem(appName, message, timestamp, year, month, day);
-
-        // Pass the notificationItem to the storeNotification() method
+        NotificationReceiver.NotificationItem notificationItem = new NotificationReceiver.NotificationItem(packageName, message, timestamp);
         NotificationReceiver.storeNotification(notificationItem);
     }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
-        // Handle notification removal if needed
+        Log.d(TAG, "onNotificationRemoved");
+
+        String packageName = sbn.getPackageName();
+        String message = "";
+        if (sbn.getNotification().tickerText != null) {
+            message = sbn.getNotification().tickerText.toString();
+        } else {
+            if (sbn.getNotification().extras != null && sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT) != null) {
+                message = sbn.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT).toString();
+            }
+        }
+        long timestamp = sbn.getPostTime();
+
+        NotificationReceiver.NotificationItem notificationItem = new NotificationReceiver.NotificationItem(packageName, message, timestamp);
+        NotificationReceiver.removeNotification(notificationItem);
     }
 }
