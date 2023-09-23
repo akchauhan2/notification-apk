@@ -1,9 +1,14 @@
 package com.akchauhan2.noticap;
 
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -11,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView listView;
     private ArrayAdapter<String> adapter;
-    private NotificationReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,18 +26,12 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         listView.setAdapter(adapter);
 
-        receiver = new NotificationReceiver();
-        NotificationReceiver.setNotificationListener(new NotificationListener() {
-            @Override
-            public void onNotificationPosted(NotificationReceiver.NotificationItem notification) {
-                adapter.add(notification.getAppName() + ": " + notification.getMessage());
-            }
-
-            @Override
-            public void onNotificationRemoved(NotificationReceiver.NotificationItem notification) {
-                adapter.remove(notification.getAppName() + ": " + notification.getMessage());
-            }
-        });
+        // Check if the app has notification access permission
+        if (!isNotificationAccessGranted()) {
+            // If not, open the notification access settings for the user to grant permission
+            openNotificationAccessSettings();
+            Toast.makeText(this, "Please grant notification access to the app", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -52,5 +50,16 @@ public class MainActivity extends AppCompatActivity {
             strings[i] = notification.getAppName() + ": " + notification.getMessage();
         }
         return strings;
+    }
+
+    private boolean isNotificationAccessGranted() {
+        ComponentName cn = new ComponentName(this, NotificationListener.class);
+        String flat = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
+        return flat != null && flat.contains(cn.flattenToString());
+    }
+
+    private void openNotificationAccessSettings() {
+        Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+        startActivity(intent);
     }
 }
