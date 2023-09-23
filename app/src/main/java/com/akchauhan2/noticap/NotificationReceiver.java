@@ -3,6 +3,9 @@ package com.akchauhan2.noticap;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,20 +32,6 @@ public class NotificationReceiver extends NotificationListenerService {
     }
 
     public static void storeNotification(NotificationItem notificationItem) {
-        System.out.println("Timestamp: Received notification");
-        // Here, you can define the logic to store the notification
-        // For example, you can store it in a database, write it to a file, or perform any other desired action
-
-        // In this example, let's simply print the notification details for demonstration purposes
-        String appName = notificationItem.getAppName();
-        String message = notificationItem.getMessage();
-        long timestamp = notificationItem.getTimestamp();
-
-        System.out.println("Received notification:");
-        System.out.println("App Name: " + appName);
-        System.out.println("Message: " + message);
-        System.out.println("Timestamp: " + timestamp);
-
         notificationList.add(notificationItem);
     }
 
