@@ -5,6 +5,7 @@ plugins {
 
 android {
     compileSdk 30
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "com.akchauhan2.noticap"
@@ -32,7 +33,8 @@ android {
 }
 
 dependencies {
-
+    implementation 'androidx.core:core-ktx:1.6.0' // Use an older version
+    implementation 'androidx.core:core:1.6.0'       // Use an older version
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
@@ -40,4 +42,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.core:core-ktx:1.7.0'
+
 }

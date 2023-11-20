@@ -15,7 +15,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     private ListView listView;
@@ -58,8 +64,33 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         adapter.clear();
         adapter.addAll(getNotificationStrings());
-    }
+        createBtn();
 
+    }
+    private  void createBtn(){
+
+        Button notifyButton = findViewById(R.id.button);
+
+        notifyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TextView textView = findViewById(R.id.textView);
+                textView.setText("clicked");
+                // Create a notification
+                Notification.Builder builder = new Notification.Builder(MainActivity.this)
+                        .setSmallIcon(R.drawable.ic_launcher_background)
+                        .setContentTitle("Sample Notification")
+                        .setContentText("This is a sample notification.");
+
+                // Get the notification manager
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                // Show the notification
+                notificationManager.notify(0, builder.build());
+            }
+        });
+    }
     private String[] getNotificationStrings() {
         List<NotificationReceiver.NotificationItem> notificationList = NotificationReceiver.getNotificationList();
         List<String> notificationStrings = new ArrayList<>();
